@@ -3,6 +3,7 @@
 An installable task board that sorts work into four quadrants: **Do**, **Schedule**, **Delegate** and **Drop**.
 
 - Works offline once installed.
+- Drag a task to another quadrant to move it. On a touchscreen, press and hold the task first, or drag its grip handle. With a task selected, keys 1–4 move it too.
 - Tasks are saved only in the browser on the device you use. Nothing is sent to a server, and no tasks are stored in this repository.
 - **Back up** saves your tasks to a `.json` file. **Restore** loads one, which is also how you move tasks to another device.
 

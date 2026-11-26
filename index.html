@@ -111,10 +111,15 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
 .q-add:hover{border-color:var(--q)}
 
 .q-list{list-style:none;margin:0;padding:0 2px 2px 0;display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-.task{flex:none;display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 6px 10px 10px;box-shadow:var(--shadow)}
-.task[draggable="true"]{cursor:grab}
-.task.dragging{opacity:.45}
+.task{flex:none;display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 4px 10px 10px;box-shadow:var(--shadow);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .task.done{background:transparent;box-shadow:none;border-style:dashed}
+.task.dragging{opacity:.35;box-shadow:none;border-style:dashed}
+.grip{flex:none;width:26px;height:32px;margin-top:-5px;display:grid;place-items:center;color:var(--faint);border-radius:8px;cursor:grab;touch-action:none}
+.grip:hover{background:var(--surface-2);color:var(--fg)}
+.task.done .grip{visibility:hidden}
+.ghost{position:fixed;left:0;top:0;z-index:70;margin:0;pointer-events:none;box-shadow:0 18px 40px rgba(0,0,0,.22),0 2px 6px rgba(0,0,0,.12);will-change:transform}
+.ghost-badge{position:absolute;top:-12px;right:10px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--q);color:var(--on-q);white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+body.is-dragging,body.is-dragging *{cursor:grabbing!important}
 .check{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--q);background:transparent;margin-top:1px;cursor:pointer;display:grid;place-items:center;color:var(--on-q);padding:0}
 .check svg{opacity:0;width:12px;height:12px}
 .check:hover svg{opacity:.35}
@@ -133,10 +138,8 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
 .chip.ex{border-style:dashed;background:transparent;color:var(--faint)}
 .promote{align-self:flex-start;padding:0;margin:0;border:0;background:none;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--q1);display:inline-flex;align-items:center;gap:5px}
 .promote:hover{text-decoration:underline}
-.t-more{flex:none;width:32px;height:32px;margin-top:-5px;border:0;background:transparent;color:var(--faint);border-radius:8px;cursor:pointer;display:grid;place-items:center;padding:0}
-.t-more:hover{background:var(--surface-2);color:var(--fg)}
 .empty{flex:none;font-size:13px;color:var(--muted);padding:14px 10px;border:1px dashed var(--q-line);border-radius:10px;text-align:center}
-.quad.drop-target{border-color:var(--q);box-shadow:0 0 0 3px var(--q-line)}
+.quad.drop-target{border-color:var(--q);box-shadow:0 0 0 2px var(--q),0 0 0 7px var(--q-line)}
 .quad.pulse{animation:pulse .8s ease}
 @keyframes pulse{0%{box-shadow:0 0 0 0 var(--q-line)}35%{box-shadow:0 0 0 6px var(--q-line)}100%{box-shadow:0 0 0 0 transparent}}
 
@@ -209,7 +212,8 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
   .t-title{font-size:13px;line-height:1.3}
   .t-body{gap:4px}
   .chip{font-size:10.5px;padding:1px 6px}
-  .t-more{display:none}
+  .grip{width:20px;height:24px;margin:-3px -2px 0 -3px}
+  .grip svg{width:12px;height:12px}
   .promote{font-size:11.5px}
   .empty{font-size:12px;padding:10px 6px}
   .tip{display:none}
@@ -312,7 +316,7 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
     4: { num: 'IV', name: 'Drop', hint: 'Let it go', empty: 'Busywork to skip.' }
   };
   const ICON_CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.4 6.3l2.4 2.3 4.8-5.1" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const ICON_MORE = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="3" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="13" cy="8" r="1.5" fill="currentColor"/></svg>';
+  const ICON_GRIP = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="5" cy="3" r="1.3" fill="currentColor"/><circle cx="9" cy="3" r="1.3" fill="currentColor"/><circle cx="5" cy="7" r="1.3" fill="currentColor"/><circle cx="9" cy="7" r="1.3" fill="currentColor"/><circle cx="5" cy="11" r="1.3" fill="currentColor"/><circle cx="9" cy="11" r="1.3" fill="currentColor"/></svg>';
   const ICON_PLUS = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2v10M2 7h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
   const ICON_ARROW = '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M10 6H2.5M5.5 2.8L2.3 6l3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
@@ -440,14 +444,13 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
     el.textContent = 'Saved on this device';
     if (finePointer) {
       const tip = document.createElement('span'); tip.className = 'tip';
-      tip.textContent = ' · Drag tasks between quadrants. Press N for a new task.';
+      tip.textContent = ' · Drag a task to another quadrant to move it. Press N for a new task.';
       el.appendChild(tip);
     }
   }
 
   // ---------- quadrant scaffolding ----------
   const quadEls = {};
-  let dragId = null;
   function buildQuadrants() {
     const matrix = $('matrix');
     for (const q of [1, 2, 3, 4]) {
@@ -474,15 +477,6 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
       sec.append(head, list);
       matrix.appendChild(sec);
       quadEls[q] = { sec, list, countN };
-
-      sec.addEventListener('dragover', (e) => { if (!dragId) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; sec.classList.add('drop-target'); });
-      sec.addEventListener('dragleave', (e) => { if (!sec.contains(e.relatedTarget)) sec.classList.remove('drop-target'); });
-      sec.addEventListener('drop', (e) => {
-        e.preventDefault(); sec.classList.remove('drop-target');
-        const t = dragId && state.tasks.get(dragId);
-        if (t && t.q !== q) { patchTask(t.id, { q }); pulse(q); }
-        dragId = null;
-      });
     }
     // Sheet picker, laid out like the matrix itself
     const pick = $('qpick');
@@ -511,7 +505,6 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
     const li = document.createElement('li');
     li.className = 'task' + (t.done ? ' done' : '');
     li.dataset.id = t.id;
-    if (finePointer && !t.done) li.draggable = true;
 
     const check = document.createElement('button');
     check.type = 'button'; check.className = 'check';
@@ -542,10 +535,11 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
       bodyEl.appendChild(pr);
     }
 
-    const more = document.createElement('button'); more.type = 'button'; more.className = 't-more';
-    more.dataset.act = 'edit'; more.setAttribute('aria-label', 'Edit or move: ' + t.title); more.innerHTML = ICON_MORE;
+    const grip = document.createElement('span'); grip.className = 'grip';
+    grip.setAttribute('aria-hidden', 'true'); grip.title = 'Drag to another quadrant';
+    grip.innerHTML = ICON_GRIP;
 
-    li.append(check, bodyEl, more);
+    li.append(check, bodyEl, grip);
     return li;
   }
 
@@ -594,18 +588,140 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
     else if (act === 'edit') openEdit(t.id);
     else if (act === 'promote') { patchTask(t.id, { q: 1 }); pulse(1); toast('Moved to I · Do'); }
   });
-  matrix.addEventListener('dragstart', (e) => {
-    const li = e.target.closest && e.target.closest('.task');
-    if (!li) return;
-    dragId = li.dataset.id;
-    try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); } catch (_) {}
-    li.classList.add('dragging');
+  function moveTo(id, q) {
+    const t = state.tasks.get(id);
+    if (!t || t.q === q) return false;
+    const from = t.q;
+    patchTask(id, { q });
+    pulse(q);
+    toast(`Moved to ${QUADS[q].num} · ${QUADS[q].name}`, () => { patchTask(id, { q: from }); pulse(from); });
+    return true;
+  }
+
+  // ---------- drag and drop (mouse, touch and pen) ----------
+  // Mouse or pen: press on a task and move a few pixels. Touch: press and hold
+  // a task briefly, or drag the grip handle right away.
+  const DRAG_THRESHOLD = 6;
+  const LONG_PRESS_MS = 300;
+  let drag = null;
+  let suppressClick = false;
+
+  function quadAt(x, y) {
+    const el = document.elementFromPoint(x, y);
+    const sec = el && el.closest && el.closest('.quad');
+    return sec ? Number(sec.dataset.q) : null;
+  }
+  function placeGhost() {
+    if (!drag || !drag.ghost) return;
+    drag.ghost.style.transform = `translate(${drag.x - drag.offsetX}px, ${drag.y - drag.offsetY}px) rotate(1.5deg)`;
+  }
+  function updateTarget() {
+    const q = quadAt(drag.x, drag.y);
+    const t = state.tasks.get(drag.id);
+    const target = q && t && q !== t.q ? q : null;
+    if (target === drag.target) return;
+    if (drag.target) quadEls[drag.target].sec.classList.remove('drop-target');
+    drag.target = target;
+    if (target) {
+      quadEls[target].sec.classList.add('drop-target');
+      drag.badge.dataset.q = String(target);
+      drag.badge.textContent = `Move to ${QUADS[target].name}`;
+      drag.badge.hidden = false;
+    } else {
+      drag.badge.hidden = true;
+    }
+  }
+  function startDrag() {
+    clearTimeout(drag.timer);
+    const t = state.tasks.get(drag.id);
+    if (!t || !drag.li.isConnected) { endDrag(); return; }
+    drag.mode = 'dragging';
+    const r = drag.li.getBoundingClientRect();
+    drag.offsetX = Math.min(Math.max(drag.startX - r.left, 0), r.width);
+    drag.offsetY = Math.min(Math.max(drag.startY - r.top, 0), r.height);
+    const g = drag.li.cloneNode(true);
+    g.classList.add('ghost');
+    g.dataset.q = String(t.q);
+    g.setAttribute('aria-hidden', 'true');
+    g.style.width = r.width + 'px';
+    const badge = document.createElement('span'); badge.className = 'ghost-badge'; badge.hidden = true;
+    g.appendChild(badge);
+    document.body.appendChild(g);
+    drag.ghost = g; drag.badge = badge; drag.target = null;
+    drag.li.classList.add('dragging');
+    document.body.classList.add('is-dragging');
+    try { drag.li.setPointerCapture(drag.pointerId); } catch (_) {}
+    if (drag.type === 'touch' && navigator.vibrate) { try { navigator.vibrate(10); } catch (_) {} }
+    placeGhost();
+    updateTarget();
+  }
+  function endDrag() {
+    if (!drag) return;
+    clearTimeout(drag.timer);
+    if (drag.ghost) drag.ghost.remove();
+    if (drag.target && quadEls[drag.target]) quadEls[drag.target].sec.classList.remove('drop-target');
+    if (drag.li) drag.li.classList.remove('dragging');
+    try { if (drag.li && drag.li.hasPointerCapture && drag.li.hasPointerCapture(drag.pointerId)) drag.li.releasePointerCapture(drag.pointerId); } catch (_) {}
+    document.body.classList.remove('is-dragging');
+    drag = null;
+  }
+
+  matrix.addEventListener('pointerdown', (e) => {
+    if (drag || !e.isPrimary) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const li = e.target.closest('.task');
+    if (!li || e.target.closest('.check, .promote')) return;
+    const t = state.tasks.get(li.dataset.id);
+    if (!t || t.done) return;
+    const onGrip = !!e.target.closest('.grip');
+    drag = {
+      id: t.id, li, pointerId: e.pointerId, type: e.pointerType || 'mouse',
+      startX: e.clientX, startY: e.clientY, x: e.clientX, y: e.clientY,
+      mode: 'pending', timer: null, ghost: null, badge: null, target: null
+    };
+    if (drag.type === 'touch') {
+      if (onGrip) { e.preventDefault(); startDrag(); }
+      else drag.timer = setTimeout(() => { if (drag && drag.mode === 'pending') startDrag(); }, LONG_PRESS_MS);
+    }
   });
-  matrix.addEventListener('dragend', () => {
-    dragId = null;
-    matrix.querySelectorAll('.dragging').forEach((el) => el.classList.remove('dragging'));
-    matrix.querySelectorAll('.drop-target').forEach((el) => el.classList.remove('drop-target'));
+  window.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    drag.x = e.clientX; drag.y = e.clientY;
+    if (drag.mode === 'pending') {
+      const dist = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
+      if (drag.type === 'touch') { if (dist > 10) endDrag(); }   // finger moved early: let the list scroll
+      else if (dist > DRAG_THRESHOLD) startDrag();
+      return;
+    }
+    e.preventDefault();
+    placeGhost();
+    updateTarget();
+  }, { passive: false });
+  window.addEventListener('pointerup', (e) => {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    if (drag.mode !== 'dragging') { endDrag(); return; }
+    drag.x = e.clientX; drag.y = e.clientY;
+    updateTarget();
+    const id = drag.id, target = drag.target;
+    endDrag();
+    // The browser fires the click for this same press right after pointerup;
+    // swallow only that one, so the next real click (like Undo) still works.
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 0);
+    if (target) moveTo(id, target);
   });
+  window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.pointerId) endDrag(); });
+  // While a task is being dragged, stop the page and lists from scrolling under the finger.
+  document.addEventListener('touchmove', (e) => { if (drag && drag.mode === 'dragging') e.preventDefault(); }, { passive: false });
+  // A drag should not also count as a click that opens the editor.
+  document.addEventListener('click', (e) => {
+    if (!suppressClick || !matrix.contains(e.target)) return;
+    suppressClick = false;
+    e.stopPropagation(); e.preventDefault();
+  }, true);
+  // Long-press on a task should start a drag, not open the system menu.
+  matrix.addEventListener('contextmenu', (e) => { if (e.target.closest('.task') && (drag || e.pointerType === 'touch' || !finePointer)) e.preventDefault(); });
+  window.addEventListener('blur', endDrag);
 
   $('newBtn').addEventListener('click', () => openAdd(2));
   $('clearDone').addEventListener('click', () => {
@@ -730,8 +846,19 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3.6vw,30
   $('sheet').addEventListener('click', (e) => { if (e.target === $('sheet')) closeSheet(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      if (drag) { endDrag(); return; }
       if (!$('sheet').hidden) { closeSheet(); return; }
       if (!$('installHelp').hidden) { $('installHelp').hidden = true; return; }
+    }
+    // With a task focused, press 1–4 to move it to that quadrant.
+    if (/^[1-4]$/.test(e.key) && !e.metaKey && !e.ctrlKey && !e.altKey && $('sheet').hidden) {
+      const li = document.activeElement && document.activeElement.closest && document.activeElement.closest('.task');
+      if (li && moveTo(li.dataset.id, Number(e.key))) {
+        e.preventDefault();
+        const moved = matrix.querySelector(`.task[data-id="${li.dataset.id}"] .t-title`);
+        if (moved) moved.focus({ preventScroll: false });
+        return;
+      }
     }
     const tag = (e.target && e.target.tagName) || '';
     if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey && $('sheet').hidden && !/INPUT|TEXTAREA|SELECT/.test(tag)) {
