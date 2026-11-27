@@ -1,6 +1,6 @@
 # Eisenhower Grid
 
-An installable task board that sorts work into four quadrants: **Do**, **Schedule**, **Delegate** and **Drop**. It's styled in Brackett & Ellis navy, gold and steel.
+An installable task board that sorts work into four quadrants: **Do**, **Schedule**, **Delegate** and **Drop**. The color palette uses Brackett & Ellis navy and champagne gold.
 
 ## What it does
 
@@ -33,4 +33,4 @@ The app at this address saves tasks only in the browser on the device you use. N
 
 Change the files, then bump `VERSION` in `sw.js` (and in `index.html`). Installed copies show "A new version is ready" with a **Reload** button.
 
-Fonts: Libre Caslon Text and Public Sans, both under the SIL Open Font License (see `fonts/`).
+Fonts: Geist and Geist Mono, under the SIL Open Font License (see `fonts/`).

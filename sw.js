@@ -1,6 +1,6 @@
 // Eisenhower Grid service worker: keeps the app working offline and updates it reliably.
 // Bump VERSION whenever any file changes so installed copies pick up the new files.
-const VERSION = '2.0.1';
+const VERSION = '2.1.0';
 const CACHE = `eisenhower-grid-${VERSION}`;
 const PAGE = './index.html';
 const ASSETS = [
@@ -13,13 +13,12 @@ const ASSETS = [
   './icons/apple-touch-icon.png',
   './icons/favicon-32.png',
   './icons/shortcut-new-96.png',
-  './fonts/public-sans-latin-400-normal.woff2',
-  './fonts/public-sans-latin-500-normal.woff2',
-  './fonts/public-sans-latin-600-normal.woff2',
-  './fonts/public-sans-latin-700-normal.woff2',
-  './fonts/libre-caslon-text-latin-400-normal.woff2',
-  './fonts/libre-caslon-text-latin-700-normal.woff2',
-  './fonts/libre-caslon-text-latin-400-italic.woff2'
+  './fonts/geist-latin-400-normal.woff2',
+  './fonts/geist-latin-500-normal.woff2',
+  './fonts/geist-latin-600-normal.woff2',
+  './fonts/geist-latin-700-normal.woff2',
+  './fonts/geist-mono-latin-400-normal.woff2',
+  './fonts/geist-mono-latin-500-normal.woff2'
 ];
 
 self.addEventListener('install', (event) => {
