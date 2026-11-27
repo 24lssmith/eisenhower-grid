@@ -766,7 +766,7 @@ textarea.inp{resize:vertical;line-height:1.45}
   'use strict';
   const BUILD = 'app';
   const IS_ARTIFACT = BUILD === 'artifact';
-  const VERSION = '2.0.0';
+  const VERSION = '2.0.1';
   const LS_TASKS = 'eisenhower-grid.tasks.v1';
   const LS_INIT = 'eisenhower-grid.initialized';
   const LS_SETTINGS = 'eisenhower-grid.settings.v2';
@@ -2029,8 +2029,18 @@ textarea.inp{resize:vertical;line-height:1.45}
   }
 
   // ---------- install + offline (app build) ----------
-  let installEvt = null;
+  let installEvt = null, swReg = null, swReloading = false;
   const installBtn = $('installBtn');
+  async function checkForUpdate() {
+    if (!swReg) { toast(`You're on Eisenhower Grid ${VERSION}.`); return; }
+    toast('Checking for updates…');
+    try { await swReg.update(); } catch (_) {}
+    setTimeout(() => {
+      if (swReloading) return;
+      if (swReg.installing || swReg.waiting) toast('Downloading the update. The app will reload when it is ready.');
+      else toast(`You have the latest version (${VERSION}).`);
+    }, 2500);
+  }
   if (!IS_ARTIFACT) {
     const updateInstallBtn = () => { installBtn.hidden = standalone(); };
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; updateInstallBtn(); });
@@ -2041,19 +2051,27 @@ textarea.inp{resize:vertical;line-height:1.45}
     });
     updateInstallBtn();
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      // A new version takes over as soon as it has downloaded; the page then reloads into it.
+      // If a form is open, it waits and offers a Reload button instead of interrupting.
+      const hadController = !!navigator.serviceWorker.controller;
+      const applyUpdate = () => {
+        if (swReloading) return;
+        if (topOverlay() || drag) { toast('Eisenhower Grid was updated.', () => { swReloading = true; location.reload(); }, 'Reload now', true); return; }
+        swReloading = true; location.reload();
+      };
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) applyUpdate(); });
       window.addEventListener('load', async () => {
         try {
-          const reg = await navigator.serviceWorker.register('sw.js');
-          const offer = (w) => toast('A new version of Eisenhower Grid is ready.', () => w.postMessage({ type: 'SKIP_WAITING' }), 'Reload', true);
-          if (reg.waiting && navigator.serviceWorker.controller) offer(reg.waiting);
-          reg.addEventListener('updatefound', () => {
-            const w = reg.installing; if (!w) return;
-            w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) offer(w); });
+          swReg = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+          if (swReg.waiting) swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          swReg.addEventListener('updatefound', () => {
+            const w = swReg.installing; if (!w) return;
+            w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) w.postMessage({ type: 'SKIP_WAITING' }); });
           });
-          let reloading = false;
-          navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloading) { reloading = true; location.reload(); } });
         } catch (_) {}
       });
+      // Home-screen apps usually resume rather than relaunch, so check for updates each time the app comes back.
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && swReg) swReg.update().catch(() => {}); });
     }
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   }
@@ -2112,6 +2130,11 @@ textarea.inp{resize:vertical;line-height:1.45}
   $('kbdK').textContent = `${MOD} K`;
   document.querySelectorAll('#keys kbd.mod').forEach((k) => { k.textContent = k.textContent.replace('Ctrl', MOD); });
   $('versionNote').textContent = `Eisenhower Grid ${VERSION}`;
+  if (!IS_ARTIFACT) {
+    const upd = h('button', 'linkish', 'Check for updates'); upd.type = 'button'; upd.style.marginLeft = '8px';
+    upd.addEventListener('click', checkForUpdate);
+    $('versionNote').appendChild(upd);
+  }
   buildQuadrants();
   applySettings();
   updateQaPreview();
