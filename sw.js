@@ -1,6 +1,6 @@
 // Eisenhower Grid service worker: keeps the app working offline and updates it reliably.
 // Bump VERSION whenever any file changes so installed copies pick up the new files.
-const VERSION = '2.1.0';
+const VERSION = '2.1.1';
 const CACHE = `eisenhower-grid-${VERSION}`;
 const PAGE = './index.html';
 const ASSETS = [
